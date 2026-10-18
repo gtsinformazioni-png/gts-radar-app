@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Radar Occasioni GTS</title>
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Radar GTS">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap">
+<style>
+/* Stile del negozio gtsmotorparts.it: fondo bianco, logo al centro, titoli maiuscoli in grassetto, pulsanti squadrati scuri, tricolore per gli stati. */
+:root{
+  --bg:#ffffff; --soft:#f5f5f5; --ink:#121212; --muted:rgba(18,18,18,.66); --line:rgba(18,18,18,.16);
+  --green:#1f8a3c; --green-soft:#e6f3ea; --red:#c8202a; --red-soft:#fbe7e8; --amber:#9a6200; --amber-soft:#fdf1dc; --dark-soft:#ececec;
+  --f:"Assistant",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.5;letter-spacing:.02em;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto;padding-block:12px 40px;display:flex;flex-direction:column;gap:16px}
+
+.bar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:saturate(1.4) blur(8px);-webkit-backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-block:8px}
+.bar-title{font-size:18px;color:var(--muted)}
+.icon-btn{width:42px;height:42px;display:grid;place-items:center;background:none;border:0;cursor:pointer;border-radius:0}
+.icon-btn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.8}
+.icon-btn.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+header.hero{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.logo{width:min(280px,72vw);height:auto;display:block}
+.tricolore{width:110px;height:4px;background:linear-gradient(90deg,var(--green) 0 33.3%,#e9e9e9 33.3% 66.6%,var(--red) 66.6%)}
+h1{font-weight:800;font-size:26px;line-height:1.15;margin:2px 0 0;text-transform:uppercase}
+.status{color:var(--muted);font-size:15px;display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block}
+.dot.ok{background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.dot.warn{background:var(--amber)}
+.dot.bad{background:var(--red)}
+
+.avviso{padding:12px 14px;font-size:15px;display:flex;gap:10px;align-items:flex-start}
+.avviso.info{background:var(--soft)}
+.avviso.warn{background:var(--amber-soft);color:#4d3100}
+.avviso.bad{background:var(--red-soft);color:#5c1015}
+.avviso b{font-weight:800}
+.avviso .btn{margin-left:auto;flex:none}
+
+.criteria{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.crit{font-size:13.5px;padding:4px 10px;background:var(--soft)}
+.azioni-top{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+.filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:none;font-weight:700;font-size:15px;padding:10px 14px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;gap:7px;align-items:center;border-radius:0}
+.chip .n{font-weight:600;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip[aria-pressed="true"] .n{color:#fff;opacity:.75}
+
+.list{display:flex;flex-direction:column;gap:14px}
+.card{border:1px solid var(--line);background:#fff;position:relative;display:flex;flex-direction:column}
+.card.nuovo{border-top:4px solid var(--red)}
+.card.scartato{opacity:.55}
+.c-top{display:flex;gap:12px;padding:14px 14px 0}
+.thumb{flex:none;width:96px;height:96px;object-fit:cover;background:var(--soft)}
+.c-head{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.model{font-weight:800;font-size:19px;line-height:1.15;text-transform:uppercase;overflow-wrap:anywhere}
+.price{font-weight:800;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+.price small{font-weight:700;font-size:12px;color:var(--red);margin-left:6px;letter-spacing:.03em}
+.specs{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.specs b{color:var(--ink);font-weight:700}
+.c-body{padding:10px 14px 0;display:flex;flex-direction:column;gap:6px}
+.damage{margin:0;font-size:15.5px}
+.damage::before{content:"DANNO  ";font-weight:800;font-size:12.5px;letter-spacing:.08em;color:var(--red)}
+.verdict{margin:0;font-size:14.5px;color:var(--muted)}
+.c-foot{margin:12px 14px 0;padding:12px 0 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.when{font-size:13.5px;color:var(--muted)}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.btn{font-weight:700;font-size:14.5px;letter-spacing:.03em;padding:11px 12px;border:1px solid var(--line);background:#fff;cursor:pointer;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:0;min-height:44px}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.full{width:100%}
+.btn:disabled{opacity:.55;cursor:default}
+.btn[data-on="interessante"][aria-pressed="true"]{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.btn[data-on="contattato"][aria-pressed="true"]{background:var(--dark-soft);border-color:var(--ink)}
+.btn[data-on="scartato"][aria-pressed="true"]{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.badge{position:absolute;top:0;right:14px;transform:translateY(-60%);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:var(--red);color:#fff;padding:3px 8px}
+.empty{background:var(--soft);padding:28px 20px;text-align:center;color:var(--muted)}
+.empty h2{font-weight:800;font-size:19px;text-transform:uppercase;color:var(--ink);margin:0 0 6px}
+.empty p{margin:0 auto;max-width:42ch}
+
+/* configurazione */
+.setup{display:flex;flex-direction:column;gap:14px}
+.setup h2{font-weight:800;font-size:20px;text-transform:uppercase;margin:0;text-align:center}
+.setup p{margin:0;color:var(--muted)}
+label{font-weight:700;font-size:14px;display:block;margin-bottom:4px}
+input[type=text],input[type=password]{width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid rgba(18,18,18,.55);border-radius:0;background:#fff;color:var(--ink)}
+input:focus{outline:2px solid var(--ink);outline-offset:1px}
+.hint{font-size:13.5px;color:var(--muted);margin-top:4px}
+.err{color:var(--red);font-weight:600;font-size:14.5px}
+
+.panel{border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
+.panel h3{margin:0;font-weight:800;text-transform:uppercase;font-size:16px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.row span:first-child{color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 16px;font-weight:600;font-size:15px;max-width:calc(100% - 32px);z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.icon-btn.spin svg{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="bar gutter">
+  <div class="bar-in">
+    <button class="icon-btn" id="btnImpostazioni" aria-label="Impostazioni" hidden>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+    <span class="bar-title">GTS Motor Parts</span>
+    <button class="icon-btn" id="btnAggiorna" aria-label="Aggiorna elenco" hidden>
+      <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="wrap gutter">
+  <header class="hero">
+    <img class="logo" src="logo.png" alt="GTS Motor Parts" width="700" height="242">
+    <div class="tricolore" aria-hidden="true"></div>
+    <h1>Radar occasioni</h1>
+    <div class="status" id="status" hidden><span class="dot" id="dot"></span><span id="statusText"></span></div>
+  </header>
+
+  <!-- PRIMO AVVIO -->
+  <section class="setup" id="vistaSetup" hidden>
+    <h2>Collega il radar</h2>
+    <p>Inserisci una sola volta i dati di GitHub che trovi nella guida. Restano salvati solo su questo telefono.</p>
+    <form id="formSetup" novalidate>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label for="inUtente">Nome utente GitHub</label>
+          <input type="text" id="inUtente" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. gtsmotorparts">
+        </div>
+        <div>
+          <label for="inRepo">Nome del repository</label>
+          <input type="text" id="inRepo" value="gts-radar" autocapitalize="off" autocorrect="off" spellcheck="false">
+        </div>
+        <div>
+          <label for="inToken">Token di accesso</label>
+          <input type="password" id="inToken" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="github_pat_…">
+          <div class="hint">Lo crei su GitHub seguendo il passo 4 della guida.</div>
+        </div>
+        <div class="err" id="setupErr" hidden></div>
+        <button class="btn primary full" id="btnCollega" type="submit">Collega</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- APP -->
+  <section id="vistaApp" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="avviso info" id="avvisoInstalla" hidden>
+      <div>Per avere le notifiche installa l'app: tocca <b>Condividi</b> in Safari, poi <b>Aggiungi alla schermata Home</b>, e apri il Radar dall'icona.</div>
+    </div>
+    <div class="avviso info" id="avvisoNotifiche" hidden>
+      <div><b>Notifiche spente.</b> Attivale per sapere subito quando arriva una moto.</div>
+      <button class="btn primary" id="btnNotifiche" type="button">Attiva</button>
+    </div>
+    <div class="avviso" id="avvisoStato" hidden></div>
+
+    <div class="criteria" id="criteri" aria-label="Criteri di ricerca"></div>
+
+    <div class="azioni-top">
+      <button class="btn" id="btnCercaOra" type="button">Cerca ora su Subito</button>
+    </div>
+
+    <nav class="filters" id="filters" aria-label="Filtra annunci">
+      <button class="chip" data-f="nuovo" aria-pressed="true">Nuove <span class="n" data-n="nuovo">0</span></button>
+      <button class="chip" data-f="interessante" aria-pressed="false">Interessanti <span class="n" data-n="interessante">0</span></button>
+      <button class="chip" data-f="contattato" aria-pressed="false">Contattate <span class="n" data-n="contattato">0</span></button>
+      <button class="chip" data-f="scartato" aria-pressed="false">Scartate <span class="n" data-n="scartato">0</span></button>
+      <button class="chip" data-f="tutte" aria-pressed="false">Tutte <span class="n" data-n="tutte">0</span></button>
+    </nav>
+
+    <main class="list" id="list"></main>
+  </section>
+
+  <!-- IMPOSTAZIONI -->
+  <section class="panel" id="vistaImpostazioni" hidden>
+    <h3>Impostazioni</h3>
+    <div class="row"><span>Repository</span><span id="impRepo"></span></div>
+    <div class="row"><span>Notifiche</span><span id="impNotifiche"></span></div>
+    <div class="row"><span>Ultimo controllo</span><span id="impUltimo"></span></div>
+    <button class="btn full" id="btnChiudiImp" type="button">Torna alle occasioni</button>
+    <button class="btn full" id="btnScollega" type="button">Scollega questo telefono</button>
+    <div id="confermaScollega" hidden style="display:flex;flex-direction:column;gap:8px">
+      <p style="margin:0">Il telefono dimentica il token e smette di ricevere notifiche. Le occasioni restano salvate su GitHub.</p>
+      <button class="btn primary full" id="btnScollegaSi" type="button">Sì, scollega</button>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const API = "https://api.github.com";
+  const CHIAVE_CFG = "gts-radar-config";
+  const STATI = [["interessante", "Interessante"], ["contattato", "Contattata"], ["scartato", "Scarta"]];
+
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (_) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (_) {} },
+  };
+
+  let cfg = store.get(CHIAVE_CFG, null);
+  let occasioni = [], stati = {}, stato = {}, config = null;
+  let filtro = new URLSearchParams(location.search).get("filtro") || store.get("gts-radar-filtro", "nuovo");
+  let caricamento = false;
+  let codaScritture = Promise.resolve();
+
+  // ---------------------------------------------------------------- utilità
+  function el(tag, cls, testo) { const e = document.createElement(tag); if (cls) e.className = cls; if (testo != null) e.textContent = testo; return e; }
+  const eur = (n) => (typeof n === "number" && isFinite(n)) ? n.toLocaleString("it-IT") + " €" : "Prezzo ?";
+  const num = (n) => (typeof n === "number" && isFinite(n)) ? n.toLocaleString("it-IT") : null;
+
+  let toastTimer;
+  function toast(msg, ms = 3200) {
+    const t = $("#toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, ms);
+  }
+
+  function dataRoma(s) {
+    // "2026-10-18 22:18:25" in ora italiana
+    if (!s) return null;
+    const m = /^(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d)/.exec(s);
+    return m ? { y: +m[1], mo: +m[2], d: +m[3], h: m[4], mi: m[5] } : null;
+  }
+  function oggiRoma(offsetGiorni = 0) {
+    const d = new Date(Date.now() - offsetGiorni * 864e5);
+    const p = new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d);
+    const g = (t) => +p.find((x) => x.type === t).value;
+    return { y: g("year"), mo: g("month"), d: g("day") };
+  }
+  const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+  function quandoPubblicato(s) {
+    const d = dataRoma(s); if (!d) return "";
+    const ug = (a, b) => a.y === b.y && a.mo === b.mo && a.d === b.d;
+    const giorno = ug(d, oggiRoma(0)) ? "oggi" : ug(d, oggiRoma(1)) ? "ieri" : `${d.d} ${MESI[d.mo - 1]}`;
+    return `pubblicata ${giorno} alle ${d.h}:${d.mi}`;
+  }
+  function fa(iso) {
+    const t = Date.parse(iso); if (!t) return "";
+    const min = Math.round((Date.now() - t) / 60000);
+    if (min < 1) return "adesso";
+    if (min < 60) return `${min} min fa`;
+    const h = Math.round(min / 60);
+    if (h < 24) return h === 1 ? "1 ora fa" : `${h} ore fa`;
+    return new Date(t).toLocaleString("it-IT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  }
+
+  function b64ToText(b64) {
+    const bin = atob(b64.replace(/\s/g, ""));
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function textToB64(txt) {
+    const bytes = new TextEncoder().encode(txt);
+    let bin = ""; const step = 0x8000;
+    for (let i = 0; i < bytes.length; i += step) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + step));
+    return btoa(bin);
+  }
+  function b64urlToBytes(s) {
+    const pad = "=".repeat((4 - (s.length % 4)) % 4);
+    const bin = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
+    return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  }
+
+  // ---------------------------------------------------------------- GitHub
+  class ErroreGitHub extends Error { constructor(msg, code) { super(msg); this.code = code; } }
+
+  async function gh(path, opzioni = {}, credenziali = cfg) {
+    let r;
+    try {
+      r = await fetch(API + path, {
+        ...opzioni,
+        cache: "no-store",
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: "Bearer " + credenziali.token,
+          "X-GitHub-Api-Version": "2022-11-28",
+          ...(opzioni.body ? { "Content-Type": "application/json" } : {}),
+        },
+      });
+    } catch (_) {
+      throw new ErroreGitHub("Nessuna connessione a internet.", "rete");
+    }
+    if (r.status === 204) return null;
+    const corpo = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const msg = r.status === 401 ? "Il token non è valido o è scaduto."
+        : r.status === 403 ? "Il token non ha i permessi necessari."
+        : r.status === 404 ? "Repository o file non trovato."
+        : (corpo.message || `Errore GitHub ${r.status}`);
+      throw new ErroreGitHub(msg, r.status);
+    }
+    return corpo;
+  }
+
+  const percorso = (nome) => `/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/data/${nome}?ref=${encodeURIComponent(cfg.branch)}`;
+
+  async function leggiFile(nome, predefinito) {
+    try {
+      const f = await gh(percorso(nome));
+      return { valore: JSON.parse(b64ToText(f.content || "")), sha: f.sha };
+    } catch (e) {
+      if (e.code === 404) return { valore: predefinito, sha: null };
+      throw e;
+    }
+  }
+
+  async function aggiornaFile(nome, predefinito, modifica, messaggio) {
+    for (let tentativo = 0; tentativo < 4; tentativo++) {
+      const { valore, sha } = await leggiFile(nome, predefinito);
+      const nuovo = modifica(structuredClone(valore));
+      const body = {
+        message: messaggio,
+        content: textToB64(JSON.stringify(nuovo, null, 1) + "\n"),
+        branch: cfg.branch,
+        ...(sha ? { sha } : {}),
+      };
+      try {
+        await gh(`/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/data/${nome}`, { method: "PUT", body: JSON.stringify(body) });
+        return nuovo;
+      } catch (e) {
+        if ((e.code === 409 || e.code === 422) && tentativo < 3) { await new Promise((r) => setTimeout(r, 600 * (tentativo + 1))); continue; }
+        throw e;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------- dati
+  async function carica(silenzioso = false) {
+    if (caricamento || !cfg) return;
+    caricamento = true;
+    $("#btnAggiorna").classList.add("spin");
+    try {
+      const [o, s, st] = await Promise.all([
+        leggiFile("occasioni.json", []),
+        leggiFile("stati.json", {}),
+        leggiFile("stato.json", {}),
+      ]);
+      occasioni = Array.isArray(o.valore) ? o.valore : [];
+      stati = s.valore && typeof s.valore === "object" ? s.valore : {};
+      stato = st.valore || {};
+      store.set("gts-radar-cache", { occasioni, stati, stato });
+      render();
+      if (!silenzioso) {
+        const n = contaStati().nuovo;
+        toast(n ? (n === 1 ? "1 occasione da valutare" : `${n} occasioni da valutare`) : "Elenco aggiornato");
+      }
+    } catch (e) {
+      mostraStato("bad", e.message);
+      if (e.code === 401 || e.code === 403) mostraAvviso("bad", `<b>Accesso negato.</b> ${esc(e.message)} Apri le impostazioni e ricollega il telefono.`);
+    } finally {
+      caricamento = false;
+      $("#btnAggiorna").classList.remove("spin");
+    }
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+  function statoDi(id) { return (stati[id] && stati[id].s) || "nuovo"; }
+
+  function contaStati() {
+    const c = { nuovo: 0, interessante: 0, contattato: 0, scartato: 0, tutte: occasioni.length };
+    occasioni.forEach((o) => { const s = statoDi(o.id); if (c[s] != null) c[s]++; });
+    return c;
+  }
+
+  function cambiaStato(id, nuovo) {
+    const prima = stati[id];
+    if (nuovo === "nuovo") delete stati[id]; else stati[id] = { s: nuovo, il: new Date().toISOString() };
+    render();
+    codaScritture = codaScritture.then(() =>
+      aggiornaFile("stati.json", {}, (obj) => {
+        if (nuovo === "nuovo") delete obj[id]; else obj[id] = stati[id];
+        return obj;
+      }, `App: ${id} → ${nuovo}`)
+    ).catch((e) => {
+      if (prima) stati[id] = prima; else delete stati[id];
+      render();
+      toast("Modifica non salvata: " + e.message, 4500);
+    });
+  }
+
+  // ---------------------------------------------------------------- vista
+  function mostraStato(tipo, testo) {
+    $("#status").hidden = false;
+    $("#dot").className = "dot " + tipo;
+    $("#statusText").textContent = testo;
+  }
+  function mostraAvviso(tipo, html) {
+    const a = $("#avvisoStato");
+    if (!html) { a.hidden = true; return; }
+    a.className = "avviso " + tipo; a.innerHTML = "<div>" + html + "</div>"; a.hidden = false;
+  }
+
+  function renderStato() {
+    const ultimo = stato.ultimoControllo;
+    if (!ultimo) {
+      mostraStato("warn", "In attesa del primo controllo");
+      mostraAvviso("info", "Il radar non ha ancora fatto il primo giro. Tocca <b>Cerca ora su Subito</b> oppure aspetta il prossimo controllo automatico.");
+      return;
+    }
+    const oreFa = (Date.now() - Date.parse(ultimo)) / 36e5;
+    const n = stato.trovatiUltimoGiro || 0;
+    const esito = n ? (n === 1 ? " · 1 nuova" : ` · ${n} nuove`) : "";
+    const errori = Array.isArray(stato.errori) ? stato.errori : [];
+    if (stato.pagineLette === 0) {
+      mostraStato("bad", "Ultimo controllo " + fa(ultimo));
+      mostraAvviso("bad", "<b>Subito non ha risposto all'ultimo controllo.</b> Il radar riprova da solo ogni 30 minuti. Se succede per molte ore di fila, scrivi a Claude.");
+    } else if (oreFa > 2.5) {
+      mostraStato("warn", "Ultimo controllo " + fa(ultimo));
+      mostraAvviso("warn", `<b>Il radar è fermo da ${Math.round(oreFa)} ore.</b> Controlla su GitHub, nella scheda Actions, che il programma sia attivo.`);
+    } else if (errori.some((e) => /ANTHROPIC|Claude/i.test(e))) {
+      mostraStato("warn", "Ultimo controllo " + fa(ultimo) + esito);
+      const chiave = errori.some((e) => /ANTHROPIC_API_KEY/.test(e));
+      mostraAvviso("warn", chiave
+        ? "<b>Manca la chiave di Claude.</b> Aggiungila su GitHub come spiegato al passo 3 della guida: senza, il radar non può leggere gli annunci."
+        : "<b>Claude non ha risposto all'ultimo giro.</b> Gli annunci verranno rivalutati al prossimo controllo. Se continua, controlla il credito sulla console di Anthropic.");
+    } else {
+      mostraStato("ok", "Ultimo controllo " + fa(ultimo) + esito);
+      mostraAvviso(null);
+    }
+  }
+
+  function renderCriteri() {
+    const c = $("#criteri"); c.replaceChildren();
+    ["Subito.it · tutta Italia", "da 600 cc in su", "dal 1998", "max 3.000 €", "ogni 30 minuti"].forEach((t) => c.append(el("span", "crit", t)));
+  }
+
+  function render() {
+    renderStato();
+    const c = contaStati();
+    document.querySelectorAll("[data-n]").forEach((n) => { n.textContent = c[n.dataset.n]; });
+    document.querySelectorAll(".chip").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.f === filtro)));
+
+    const list = $("#list");
+    const vis = occasioni.filter((o) => filtro === "tutte" || statoDi(o.id) === filtro);
+    list.replaceChildren();
+    if (!vis.length) {
+      const box = el("div", "empty");
+      if (!occasioni.length) box.append(el("h2", null, "Nessuna occasione ancora"), el("p", null, "Le moto trovate su Subito compariranno qui. Il radar controlla da solo ogni 30 minuti."));
+      else if (filtro === "nuovo") box.append(el("h2", null, "Tutto valutato"), el("p", null, "Le prossime moto arriveranno con il prossimo controllo, e ti avviso con una notifica."));
+      else box.append(el("h2", null, "Lista vuota"), el("p", null, "Usa i pulsanti sotto ogni moto per spostarla qui."));
+      list.append(box);
+      return;
+    }
+
+    vis.forEach((o) => {
+      const s = statoDi(o.id);
+      const card = el("article", "card " + s);
+      if (s === "nuovo") card.append(el("span", "badge", "Nuova"));
+
+      const top = el("div", "c-top");
+      if (o.foto && /^https:\/\/images\.sbito\.it\//.test(o.foto)) {
+        const img = el("img", "thumb"); img.src = o.foto; img.alt = ""; img.loading = "lazy"; img.decoding = "async";
+        img.onerror = () => img.remove();
+        top.append(img);
+      }
+      const head = el("div", "c-head");
+      head.append(el("div", "model", o.titolo || "Moto"));
+      const pr = el("div", "price", eur(o.prezzo));
+      if (o.prezzoDaVerificare) pr.append(el("small", null, "DA VERIFICARE"));
+      head.append(pr);
+      const specs = el("div", "specs");
+      const add = (pre, val) => { if (val == null || val === "") return; const sp = el("span"); if (pre) sp.append(pre + " "); sp.append(el("b", null, String(val))); specs.append(sp); };
+      add("", o.cc ? o.cc + " cc" : null);
+      add("anno", o.anno);
+      add("km", num(o.km));
+      head.append(specs);
+      if (o.citta) head.append(el("div", "specs", o.citta + (o.azienda ? " · rivenditore" : "")));
+      top.append(head);
+      card.append(top);
+
+      const body = el("div", "c-body");
+      if (o.danno) body.append(el("p", "damage", o.danno));
+      if (o.giudizio) body.append(el("p", "verdict", o.giudizio));
+      card.append(body);
+
+      const foot = el("div", "c-foot");
+      foot.append(el("div", "when", [quandoPubblicato(o.pubblicato), o.trovatoIl ? "trovata " + fa(o.trovatoIl) : ""].filter(Boolean).join(" · ")));
+      if (o.url && /^https:\/\/(www\.)?subito\.it\//.test(o.url)) {
+        const a = el("a", "btn primary full", "Apri annuncio su Subito"); a.href = o.url; a.target = "_blank"; a.rel = "noopener";
+        foot.append(a);
+      }
+      const acts = el("div", "actions");
+      STATI.forEach(([k, label]) => {
+        const b = el("button", "btn", label); b.type = "button"; b.dataset.on = k;
+        b.setAttribute("aria-pressed", String(s === k));
+        b.addEventListener("click", () => cambiaStato(o.id, s === k ? "nuovo" : k));
+        acts.append(b);
+      });
+      foot.append(acts);
+      card.append(foot);
+      list.append(card);
+    });
+  }
+
+  // ---------------------------------------------------------------- notifiche
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const installata = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+
+  async function statoNotifiche() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return isIOS && !installata ? "installa" : "non-supportate";
+    if (Notification.permission === "denied") return "bloccate";
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      return sub && Notification.permission === "granted" ? "attive" : "spente";
+    } catch (_) { return "spente"; }
+  }
+
+  async function aggiornaAvvisiNotifiche() {
+    const st = await statoNotifiche();
+    $("#avvisoInstalla").hidden = !(st === "installa" || (isIOS && !installata));
+    $("#avvisoNotifiche").hidden = st !== "spente" || (isIOS && !installata);
+    $("#impNotifiche").textContent = { attive: "Attive", spente: "Spente", bloccate: "Bloccate nelle impostazioni dell'iPhone", installa: "Installa prima l'app", "non-supportate": "Non disponibili" }[st];
+  }
+
+  async function attivaNotifiche() {
+    const btn = $("#btnNotifiche"); btn.disabled = true;
+    try {
+      if (!stato.vapidPublicKey) { await carica(true); }
+      if (!stato.vapidPublicKey) { toast("Aspetta il primo controllo del radar, poi riprova.", 4500); return; }
+      const permesso = await Notification.requestPermission();
+      if (permesso !== "granted") { toast("Notifiche non consentite. Puoi attivarle da Impostazioni › Notifiche › Radar GTS.", 5000); return; }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64urlToBytes(stato.vapidPublicKey) });
+      const json = sub.toJSON();
+      await aggiornaFile("push.json", { iscrizioni: [] }, (obj) => {
+        obj.iscrizioni = (obj.iscrizioni || []).filter((x) => x.endpoint !== json.endpoint);
+        obj.iscrizioni.push({ endpoint: json.endpoint, keys: json.keys, aggiunta: new Date().toISOString() });
+        return obj;
+      }, "App: attivate le notifiche");
+      toast("Notifiche attive ✓");
+    } catch (e) {
+      toast("Non sono riuscito ad attivare le notifiche: " + e.message, 5000);
+    } finally {
+      btn.disabled = false;
+      aggiornaAvvisiNotifiche();
+    }
+  }
+
+  // ---------------------------------------------------------------- azioni
+  async function cercaOra() {
+    const b = $("#btnCercaOra"); b.disabled = true; b.textContent = "Avvio la ricerca…";
+    try {
+      await gh(`/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/actions/workflows/radar.yml/dispatches`, {
+        method: "POST", body: JSON.stringify({ ref: cfg.branch }),
+      });
+      toast("Ricerca avviata: i risultati arrivano tra 1-2 minuti.", 4500);
+      b.textContent = "Ricerca in corso…";
+      setTimeout(() => carica(true), 75000);
+      setTimeout(() => { carica(false); b.disabled = false; b.textContent = "Cerca ora su Subito"; }, 140000);
+    } catch (e) {
+      toast(e.code === 403 ? "Il token non può avviare la ricerca: aggiungi il permesso Actions (passo 4 della guida)." : e.message, 5500);
+      b.disabled = false; b.textContent = "Cerca ora su Subito";
+    }
+  }
+
+  async function collega(ev) {
+    ev.preventDefault();
+    const owner = $("#inUtente").value.trim().replace(/^@/, "");
+    const repo = ($("#inRepo").value.trim() || "gts-radar");
+    const token = $("#inToken").value.trim();
+    const err = $("#setupErr"); err.hidden = true;
+    if (!owner || !token) { err.textContent = "Compila nome utente e token."; err.hidden = false; return; }
+    const b = $("#btnCollega"); b.disabled = true; b.textContent = "Verifico…";
+    try {
+      const info = await gh(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, {}, { token });
+      if (info.permissions && info.permissions.push === false) throw new ErroreGitHub("Il token può leggere ma non scrivere: rivedi i permessi (passo 4 della guida).", 403);
+      cfg = { owner, repo, token, branch: info.default_branch || "main" };
+      store.set(CHIAVE_CFG, cfg);
+      $("#inToken").value = "";
+      avvia();
+    } catch (e) {
+      err.textContent = e.code === 404 ? "Non trovo il repository: controlla nome utente e nome del repository, e che il token abbia accesso a quel repository." : e.message;
+      err.hidden = false;
+    } finally {
+      b.disabled = false; b.textContent = "Collega";
+    }
+  }
+
+  function mostraVista(v) {
+    $("#vistaSetup").hidden = v !== "setup";
+    $("#vistaApp").hidden = v !== "app";
+    $("#vistaImpostazioni").hidden = v !== "imp";
+    $("#btnImpostazioni").hidden = v === "setup";
+    $("#btnAggiorna").hidden = v !== "app";
+  }
+
+  function avvia() {
+    if (!cfg) { mostraVista("setup"); return; }
+    mostraVista("app");
+    renderCriteri();
+    const cache = store.get("gts-radar-cache", null);
+    if (cache) { occasioni = cache.occasioni || []; stati = cache.stati || {}; stato = cache.stato || {}; render(); }
+    else mostraStato("warn", "Carico le occasioni…");
+    carica(true);
+    aggiornaAvvisiNotifiche();
+  }
+
+  // ---------------------------------------------------------------- eventi
+  $("#formSetup").addEventListener("submit", collega);
+  $("#btnAggiorna").addEventListener("click", () => carica(false));
+  $("#btnCercaOra").addEventListener("click", cercaOra);
+  $("#btnNotifiche").addEventListener("click", attivaNotifiche);
+  $("#btnImpostazioni").addEventListener("click", () => {
+    $("#impRepo").textContent = cfg ? `${cfg.owner}/${cfg.repo}` : "";
+    $("#impUltimo").textContent = stato.ultimoControllo ? fa(stato.ultimoControllo) : "mai";
+    $("#confermaScollega").hidden = true;
+    aggiornaAvvisiNotifiche();
+    mostraVista("imp");
+  });
+  $("#btnChiudiImp").addEventListener("click", () => mostraVista("app"));
+  $("#btnScollega").addEventListener("click", () => { $("#confermaScollega").hidden = false; });
+  $("#btnScollegaSi").addEventListener("click", async () => {
+    try { const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch (_) {}
+    store.del(CHIAVE_CFG); store.del("gts-radar-cache"); cfg = null; occasioni = []; stati = {}; stato = {};
+    $("#status").hidden = true;
+    mostraVista("setup");
+  });
+  document.querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => {
+    filtro = b.dataset.f; store.set("gts-radar-filtro", filtro);
+    if (location.search) history.replaceState(null, "", location.pathname);
+    render(); window.scrollTo({ top: 0, behavior: "smooth" });
+  }));
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && cfg) carica(true); });
+  setInterval(() => { if (document.visibilityState === "visible" && cfg) carica(true); }, 5 * 60 * 1000);
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+    navigator.serviceWorker.addEventListener("message", (e) => { if (e.data && e.data.tipo === "aggiorna") { filtro = "nuovo"; carica(true); } });
+  }
+
+  avvia();
+})();
+</script>
+</body>
+</html>
