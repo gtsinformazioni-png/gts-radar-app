@@ -1,5 +1,5 @@
 // Service worker del Radar GTS: tiene l'app disponibile anche offline e mostra le notifiche.
-const VERSIONE = "radar-gts-v1";
+const VERSIONE = "radar-gts-v2";
 const FILE_APP = ["./", "./index.html", "./manifest.webmanifest", "./logo.png", "./icon-192.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
